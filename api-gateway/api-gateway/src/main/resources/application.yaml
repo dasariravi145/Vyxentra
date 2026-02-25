@@ -1,3 +1,153 @@
 spring:
   application:
     name: api-gateway
+
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          httpclient:
+            connect-timeout: 5000
+            response-timeout: 10s
+            pool:
+              type: elastic
+              max-idle-time: 60s
+              max-life-time: 300s
+      metrics:
+        enabled: true
+
+    loadbalancer:
+      cache:
+        enabled: true
+      health-check:
+        initial-delay: 1s
+        interval: 10s
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 5s
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: -1ms
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth-service:8081
+
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:7146/config}
+
+server:
+  port: ${GATEWAY_PORT:7147}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
+  http2:
+    enabled: true
+  forward-headers-strategy: framework
+
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationAndValidationMustBeAtLeast32CharactersLong}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      access: unrestricted
+  metrics:
+    tags:
+      application: api-gateway
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  level:
+    com.enterprise.vehicle: ${LOG_LEVEL:DEBUG}
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: INFO
+    reactor.netty.http.client: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_PATH:./logs}/api-gateway.log
+  logback:
+    rollingpolicy:
+      max-history: 30
+      max-file-size: 10MB
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 5s
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 10s
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.cloud.gateway.support.NotFoundException
+
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:7145/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+    registry-fetch-interval-seconds: 10
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+    metadata-map:
+      startup: ${random.int}
+      version: 1.0
+
+info:
+  app:
+    name: API Gateway
+    description: Vehicle Service Platform API Gateway
+    version: 1.0.0
+    java:
+      version: ${java.version}

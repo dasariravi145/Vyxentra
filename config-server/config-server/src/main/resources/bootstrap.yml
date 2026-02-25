@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    config:
+      enabled: false  # Config server doesn't need to fetch from itself
+      allow-override: true
+      override-none: true
+      override-system-properties: false
+
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: console
+
+# Encryption key from environment (for AES fallback)
+encrypt:
+  key: ${ENCRYPT_KEY:}
+  salt: ${ENCRYPT_SALT:}

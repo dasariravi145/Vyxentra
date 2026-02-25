@@ -1,0 +1,743 @@
+2026-02-25 21:46:29.621 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 21:46:29.621 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@14bae047 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 21:46:29.621 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 21:46:29.621 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@585ac855 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 21:46:29.621 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 21:46:29.621 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@5bb8f9e2 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 21:46:29.684 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.IllegalStateException: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [layout] of type [ch.qos.logback.contrib.json.classic.JsonLayout] java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:347)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initialize(LoggingApplicationListener.java:298)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEnvironmentPreparedEvent(LoggingApplicationListener.java:246)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEvent(LoggingApplicationListener.java:223)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:185)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:156)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:138)
+	at org.springframework.boot.context.event.EventPublishingRunListener.multicastInitialEvent(EventPublishingRunListener.java:136)
+	at org.springframework.boot.context.event.EventPublishingRunListener.environmentPrepared(EventPublishingRunListener.java:81)
+	at org.springframework.boot.SpringApplicationRunListeners.lambda$environmentPrepared$2(SpringApplicationRunListeners.java:64)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:118)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:112)
+	at org.springframework.boot.SpringApplicationRunListeners.environmentPrepared(SpringApplicationRunListeners.java:63)
+	at org.springframework.boot.SpringApplication.prepareEnvironment(SpringApplication.java:353)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:313)
+	at com.vyxentra.vehicle.ApiGatewayApplication.main(ApiGatewayApplication.java:19)
+Caused by: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [layout] of type [ch.qos.logback.contrib.json.classic.JsonLayout] java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.reportConfigurationErrorsIfNecessary(LogbackLoggingSystem.java:289)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:267)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initializeWithConventions(AbstractLoggingSystem.java:81)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initialize(AbstractLoggingSystem.java:61)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.initialize(LogbackLoggingSystem.java:195)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:332)
+	... 17 common frames omitted
+	Suppressed: java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+		at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+		at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+		at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+		at ch.qos.logback.core.util.Loader.loadClass(Loader.java:116)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.doComplex(ImplicitModelHandler.java:136)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.handle(ImplicitModelHandler.java:96)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:244)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.traversalLoop(DefaultProcessor.java:88)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.process(DefaultProcessor.java:104)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.processModel(GenericXMLConfigurator.java:239)
+		at org.springframework.boot.logging.logback.SpringBootJoranConfigurator.processModel(SpringBootJoranConfigurator.java:136)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:195)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:139)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:76)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.configureByResourceUrl(LogbackLoggingSystem.java:298)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.lambda$loadConfiguration$2(LogbackLoggingSystem.java:260)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.withLoggingSuppressed(LogbackLoggingSystem.java:481)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:252)
+		... 21 common frames omitted
+2026-02-25 22:14:50.506 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:14:50.508 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@14bae047 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:14:50.509 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:14:50.509 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@585ac855 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:14:50.509 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:14:50.509 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@5bb8f9e2 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:14:50.543 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.IllegalStateException: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [layout] of type [ch.qos.logback.contrib.json.classic.JsonLayout] java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:347)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initialize(LoggingApplicationListener.java:298)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEnvironmentPreparedEvent(LoggingApplicationListener.java:246)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEvent(LoggingApplicationListener.java:223)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:185)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:156)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:138)
+	at org.springframework.boot.context.event.EventPublishingRunListener.multicastInitialEvent(EventPublishingRunListener.java:136)
+	at org.springframework.boot.context.event.EventPublishingRunListener.environmentPrepared(EventPublishingRunListener.java:81)
+	at org.springframework.boot.SpringApplicationRunListeners.lambda$environmentPrepared$2(SpringApplicationRunListeners.java:64)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:118)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:112)
+	at org.springframework.boot.SpringApplicationRunListeners.environmentPrepared(SpringApplicationRunListeners.java:63)
+	at org.springframework.boot.SpringApplication.prepareEnvironment(SpringApplication.java:353)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:313)
+	at com.vyxentra.vehicle.ApiGatewayApplication.main(ApiGatewayApplication.java:19)
+Caused by: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [layout] of type [ch.qos.logback.contrib.json.classic.JsonLayout] java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.reportConfigurationErrorsIfNecessary(LogbackLoggingSystem.java:289)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:267)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initializeWithConventions(AbstractLoggingSystem.java:81)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initialize(AbstractLoggingSystem.java:61)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.initialize(LogbackLoggingSystem.java:195)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:332)
+	... 17 common frames omitted
+	Suppressed: java.lang.ClassNotFoundException: ch.qos.logback.contrib.json.classic.JsonLayout
+		at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+		at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+		at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+		at ch.qos.logback.core.util.Loader.loadClass(Loader.java:116)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.doComplex(ImplicitModelHandler.java:136)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.handle(ImplicitModelHandler.java:96)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:244)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.traversalLoop(DefaultProcessor.java:88)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.process(DefaultProcessor.java:104)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.processModel(GenericXMLConfigurator.java:239)
+		at org.springframework.boot.logging.logback.SpringBootJoranConfigurator.processModel(SpringBootJoranConfigurator.java:136)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:195)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:139)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:76)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.configureByResourceUrl(LogbackLoggingSystem.java:298)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.lambda$loadConfiguration$2(LogbackLoggingSystem.java:260)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.withLoggingSuppressed(LogbackLoggingSystem.java:481)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:252)
+		... 21 common frames omitted
+2026-02-25 22:16:35.572 [main] INFO  c.v.vehicle.ApiGatewayApplication - Starting ApiGatewayApplication using Java 17.0.12 with PID 13216 (D:\Vyxentra\api-gateway\api-gateway\target\classes started by ADMIN in D:\Vyxentra)
+2026-02-25 22:16:35.638 [main] INFO  c.v.vehicle.ApiGatewayApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 22:16:35.814 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:16:35.815 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@534ca02b uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:16:35.816 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:16:35.816 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@3eba57a7 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:16:35.817 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:16:35.817 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@272a179c uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:16:39.285 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-25 22:16:39.294 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-25 22:16:39.413 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 64 ms. Found 0 Redis repository interfaces.
+2026-02-25 22:16:40.428 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=bdb695f8-287b-3402-a328-1287d3e2b6c6
+2026-02-25 22:16:41.104 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7147 (http)
+2026-02-25 22:16:41.132 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-25 22:16:41.133 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-25 22:16:41.337 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-02-25 22:16:41.340 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 5105 ms
+2026-02-25 22:16:42.984 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'customRouteLocator' defined in class path resource [com/vyxentra/vehicle/config/GatewayConfig.class]: Failed to instantiate [org.springframework.cloud.gateway.route.RouteLocator]: Factory method 'customRouteLocator' threw exception with message: Error creating bean with name 'pathRoutePredicateFactory' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration.class]: Unsatisfied dependency expressed through method 'pathRoutePredicateFactory' parameter 0: No qualifying bean of type 'org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2026-02-25 22:16:43.009 [main] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-02-25 22:16:43.033 [main] WARN  o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: logging.file.max-history
+		Line: 103
+		Replacement: logging.logback.rollingpolicy.max-history
+	Key: logging.file.max-size
+		Line: 102
+		Replacement: logging.logback.rollingpolicy.max-file-size
+	Key: management.metrics.export.prometheus.enabled
+		Line: 81
+		Replacement: management.prometheus.metrics.export.enabled
+	Key: spring.cloud.gateway.discovery.locator.enabled
+		Line: 11
+		Replacement: spring.cloud.gateway.server.webflux.discovery.locator.enabled
+	Key: spring.cloud.gateway.discovery.locator.lower-case-service-id
+		Line: 12
+		Replacement: spring.cloud.gateway.server.webflux.discovery.locator.lower-case-service-id
+	Key: spring.cloud.gateway.httpclient.connect-timeout
+		Line: 14
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.connect-timeout
+	Key: spring.cloud.gateway.httpclient.pool.max-idle-time
+		Line: 18
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-idle-time
+	Key: spring.cloud.gateway.httpclient.pool.max-life-time
+		Line: 19
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-life-time
+	Key: spring.cloud.gateway.httpclient.pool.type
+		Line: 17
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.type
+	Key: spring.cloud.gateway.httpclient.response-timeout
+		Line: 15
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.response-timeout
+	Key: spring.cloud.gateway.metrics.enabled
+		Line: 8
+		Replacement: spring.cloud.gateway.server.webflux.metrics.enabled
+	Key: spring.redis.host
+		Line: 31
+		Replacement: spring.data.redis.host
+	Key: spring.redis.password
+		Line: 33
+		Replacement: spring.data.redis.password
+	Key: spring.redis.port
+		Line: 32
+		Replacement: spring.data.redis.port
+	Key: spring.redis.timeout
+		Line: 34
+		Replacement: spring.data.redis.timeout
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2026-02-25 22:16:43.036 [main] ERROR o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that are no longer supported was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: management.endpoint.gateway.enabled
+		Line: 77
+		Reason: Replacement key 'management.endpoint.gateway.access' uses an incompatible target type
+	Key: spring.redis.lettuce.pool.max-active
+		Line: 37
+		Reason: none
+	Key: spring.redis.lettuce.pool.max-idle
+		Line: 38
+		Reason: none
+	Key: spring.redis.lettuce.pool.max-wait
+		Line: 40
+		Reason: none
+	Key: spring.redis.lettuce.pool.min-idle
+		Line: 39
+		Reason: none
+
+
+Please refer to the release notes or reference guide for potential alternatives.
+
+2026-02-25 22:16:43.067 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-25 22:16:43.122 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method pathRoutePredicateFactory in org.springframework.cloud.gateway.config.GatewayAutoConfiguration required a bean of type 'org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties' in your configuration.
+
+2026-02-25 22:21:14.263 [main] INFO  c.v.vehicle.ApiGatewayApplication - Starting ApiGatewayApplication using Java 17.0.12 with PID 2504 (D:\Vyxentra\api-gateway\api-gateway\target\classes started by ADMIN in D:\Vyxentra)
+2026-02-25 22:21:14.305 [main] INFO  c.v.vehicle.ApiGatewayApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 22:21:14.434 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:21:14.435 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@3068b369 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:21:14.436 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:21:14.437 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@648ee871 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:21:14.438 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:21:14.439 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@375b5b7f uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:21:17.675 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-25 22:21:17.680 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-25 22:21:17.820 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 83 ms. Found 0 Redis repository interfaces.
+2026-02-25 22:21:18.793 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=028711eb-54e6-3674-a145-bb1c61c9385f
+2026-02-25 22:21:19.529 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7147 (http)
+2026-02-25 22:21:19.565 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-25 22:21:19.566 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-25 22:21:21.913 [main] INFO  o.s.b.a.s.r.ReactiveUserDetailsServiceAutoConfiguration - 
+
+Using generated security password: d2fe18b2-8260-4000-8f5d-18e866b7f08a
+
+2026-02-25 22:21:22.742 [main] WARN  o.s.c.g.c.GatewayClassPathWarningAutoConfiguration - 
+
+**********************************************************
+
+The artifact spring-cloud-gateway-server is deprecated. It will be removed in the next major release. Please add spring-cloud-gateway-server-webflux dependency.
+
+**********************************************************
+
+
+2026-02-25 22:21:24.493 [main] WARN  o.s.b.w.r.c.AnnotationConfigReactiveWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'gatewayControllerEndpoint' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration$GatewayActuatorConfiguration.class]: Unsatisfied dependency expressed through method 'gatewayControllerEndpoint' parameter 1: Error creating bean with name 'requestRateLimiterGatewayFilterFactory' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration.class]: Unsatisfied dependency expressed through method 'requestRateLimiterGatewayFilterFactory' parameter 0: No qualifying bean of type 'org.springframework.cloud.gateway.filter.ratelimit.RateLimiter<?>' available: expected single matching bean but found 2: redisRateLimiter,strictRedisRateLimiter
+2026-02-25 22:21:24.525 [main] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-02-25 22:21:24.558 [main] WARN  o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: spring.cloud.gateway.httpclient.connect-timeout
+		Line: 21
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.connect-timeout
+	Key: spring.cloud.gateway.httpclient.pool.max-idle-time
+		Line: 25
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-idle-time
+	Key: spring.cloud.gateway.httpclient.pool.max-life-time
+		Line: 26
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-life-time
+	Key: spring.cloud.gateway.httpclient.pool.type
+		Line: 24
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.type
+	Key: spring.cloud.gateway.httpclient.response-timeout
+		Line: 22
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.response-timeout
+	Key: spring.cloud.gateway.metrics.enabled
+		Line: 18
+		Replacement: spring.cloud.gateway.server.webflux.metrics.enabled
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2026-02-25 22:21:24.560 [main] ERROR o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that are no longer supported was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: management.endpoint.gateway.enabled
+		Line: 85
+		Reason: Replacement key 'management.endpoint.gateway.access' uses an incompatible target type
+
+
+Please refer to the release notes or reference guide for potential alternatives.
+
+2026-02-25 22:21:24.619 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-25 22:21:24.665 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method requestRateLimiterGatewayFilterFactory in org.springframework.cloud.gateway.config.GatewayAutoConfiguration required a single bean, but 2 were found:
+	- redisRateLimiter: defined by method 'redisRateLimiter' in class path resource [com/vyxentra/vehicle/config/RateLimiterConfig.class]
+	- strictRedisRateLimiter: defined by method 'strictRedisRateLimiter' in class path resource [com/vyxentra/vehicle/config/RateLimiterConfig.class]
+
+This may be due to missing parameter name information
+
+Action:
+
+Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+
+Ensure that your compiler is configured to use the '-parameters' flag.
+You may need to update both your build tool settings as well as your IDE.
+(See https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-6.1-Release-Notes#parameter-name-retention)
+
+
+2026-02-25 22:22:15.941 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:22:15.943 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@3068b369 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:22:15.943 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:22:15.943 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@648ee871 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:22:15.943 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:22:15.943 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@375b5b7f uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:22:15.988 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.IllegalStateException: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [encoder] of type [net.logstash.logback.encoder.LogstashEncoder] java.lang.ClassNotFoundException: net.logstash.logback.encoder.LogstashEncoder
+ERROR in ch.qos.logback.core.rolling.RollingFileAppender[JSON] - No encoder set for the appender named "JSON".
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:347)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initialize(LoggingApplicationListener.java:298)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEnvironmentPreparedEvent(LoggingApplicationListener.java:246)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.onApplicationEvent(LoggingApplicationListener.java:223)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.doInvokeListener(SimpleApplicationEventMulticaster.java:185)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.invokeListener(SimpleApplicationEventMulticaster.java:178)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:156)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:138)
+	at org.springframework.boot.context.event.EventPublishingRunListener.multicastInitialEvent(EventPublishingRunListener.java:136)
+	at org.springframework.boot.context.event.EventPublishingRunListener.environmentPrepared(EventPublishingRunListener.java:81)
+	at org.springframework.boot.SpringApplicationRunListeners.lambda$environmentPrepared$2(SpringApplicationRunListeners.java:64)
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:118)
+	at org.springframework.boot.SpringApplicationRunListeners.doWithListeners(SpringApplicationRunListeners.java:112)
+	at org.springframework.boot.SpringApplicationRunListeners.environmentPrepared(SpringApplicationRunListeners.java:63)
+	at org.springframework.boot.SpringApplication.prepareEnvironment(SpringApplication.java:353)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:313)
+	at com.vyxentra.vehicle.ApiGatewayApplication.main(ApiGatewayApplication.java:19)
+Caused by: java.lang.IllegalStateException: Logback configuration error detected: 
+ERROR in ch.qos.logback.core.model.processor.ImplicitModelHandler - Could not create component [encoder] of type [net.logstash.logback.encoder.LogstashEncoder] java.lang.ClassNotFoundException: net.logstash.logback.encoder.LogstashEncoder
+ERROR in ch.qos.logback.core.rolling.RollingFileAppender[JSON] - No encoder set for the appender named "JSON".
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.reportConfigurationErrorsIfNecessary(LogbackLoggingSystem.java:289)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:267)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initializeWithConventions(AbstractLoggingSystem.java:81)
+	at org.springframework.boot.logging.AbstractLoggingSystem.initialize(AbstractLoggingSystem.java:61)
+	at org.springframework.boot.logging.logback.LogbackLoggingSystem.initialize(LogbackLoggingSystem.java:195)
+	at org.springframework.boot.context.logging.LoggingApplicationListener.initializeSystem(LoggingApplicationListener.java:332)
+	... 17 common frames omitted
+	Suppressed: java.lang.ClassNotFoundException: net.logstash.logback.encoder.LogstashEncoder
+		at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+		at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+		at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+		at ch.qos.logback.core.util.Loader.loadClass(Loader.java:116)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.doComplex(ImplicitModelHandler.java:136)
+		at ch.qos.logback.core.model.processor.ImplicitModelHandler.handle(ImplicitModelHandler.java:96)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:244)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.secondPhaseTraverse(DefaultProcessor.java:256)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.traversalLoop(DefaultProcessor.java:88)
+		at ch.qos.logback.core.model.processor.DefaultProcessor.process(DefaultProcessor.java:104)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.processModel(GenericXMLConfigurator.java:239)
+		at org.springframework.boot.logging.logback.SpringBootJoranConfigurator.processModel(SpringBootJoranConfigurator.java:136)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:195)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:139)
+		at ch.qos.logback.core.joran.GenericXMLConfigurator.doConfigure(GenericXMLConfigurator.java:76)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.configureByResourceUrl(LogbackLoggingSystem.java:298)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.lambda$loadConfiguration$2(LogbackLoggingSystem.java:260)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.withLoggingSuppressed(LogbackLoggingSystem.java:481)
+		at org.springframework.boot.logging.logback.LogbackLoggingSystem.loadConfiguration(LogbackLoggingSystem.java:252)
+		... 21 common frames omitted
+2026-02-25 22:25:26.052 [main] INFO  c.v.vehicle.ApiGatewayApplication - Starting ApiGatewayApplication using Java 17.0.12 with PID 17912 (D:\Vyxentra\api-gateway\api-gateway\target\classes started by ADMIN in D:\Vyxentra)
+2026-02-25 22:25:26.061 [main] INFO  c.v.vehicle.ApiGatewayApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 22:25:26.176 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:25:26.176 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@57bd2029 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:25:26.176 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:25:26.176 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@796d3c9f uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:25:26.176 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:25:26.176 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@6bff19ff uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:25:29.252 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-25 22:25:29.259 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-25 22:25:29.386 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 67 ms. Found 0 Redis repository interfaces.
+2026-02-25 22:25:30.116 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=001f5a95-d042-3ebd-8818-8be5cd645d0e
+2026-02-25 22:25:30.798 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7147 (http)
+2026-02-25 22:25:30.827 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-25 22:25:30.827 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-25 22:25:32.791 [main] INFO  o.s.b.a.s.r.ReactiveUserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 61c73eb1-c031-40c7-b379-09ec9ba57ca1
+
+2026-02-25 22:25:33.290 [main] WARN  o.s.c.g.c.GatewayClassPathWarningAutoConfiguration - 
+
+**********************************************************
+
+The artifact spring-cloud-gateway-server is deprecated. It will be removed in the next major release. Please add spring-cloud-gateway-server-webflux dependency.
+
+**********************************************************
+
+
+2026-02-25 22:25:34.735 [main] WARN  o.s.b.w.r.c.AnnotationConfigReactiveWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'gatewayControllerEndpoint' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration$GatewayActuatorConfiguration.class]: Unsatisfied dependency expressed through method 'gatewayControllerEndpoint' parameter 1: Error creating bean with name 'requestRateLimiterGatewayFilterFactory' defined in class path resource [org/springframework/cloud/gateway/config/GatewayAutoConfiguration.class]: Unsatisfied dependency expressed through method 'requestRateLimiterGatewayFilterFactory' parameter 0: No qualifying bean of type 'org.springframework.cloud.gateway.filter.ratelimit.RateLimiter<?>' available: expected single matching bean but found 2: redisRateLimiter,strictRedisRateLimiter
+2026-02-25 22:25:34.762 [main] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-02-25 22:25:34.770 [main] WARN  o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: spring.cloud.gateway.httpclient.connect-timeout
+		Line: 21
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.connect-timeout
+	Key: spring.cloud.gateway.httpclient.pool.max-idle-time
+		Line: 25
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-idle-time
+	Key: spring.cloud.gateway.httpclient.pool.max-life-time
+		Line: 26
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-life-time
+	Key: spring.cloud.gateway.httpclient.pool.type
+		Line: 24
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.type
+	Key: spring.cloud.gateway.httpclient.response-timeout
+		Line: 22
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.response-timeout
+	Key: spring.cloud.gateway.metrics.enabled
+		Line: 18
+		Replacement: spring.cloud.gateway.server.webflux.metrics.enabled
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2026-02-25 22:25:34.786 [main] ERROR o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that are no longer supported was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: management.endpoint.gateway.enabled
+		Line: 85
+		Reason: Replacement key 'management.endpoint.gateway.access' uses an incompatible target type
+
+
+Please refer to the release notes or reference guide for potential alternatives.
+
+2026-02-25 22:25:34.811 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-25 22:25:34.849 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of method requestRateLimiterGatewayFilterFactory in org.springframework.cloud.gateway.config.GatewayAutoConfiguration required a single bean, but 2 were found:
+	- redisRateLimiter: defined by method 'redisRateLimiter' in class path resource [com/vyxentra/vehicle/config/RateLimiterConfig.class]
+	- strictRedisRateLimiter: defined by method 'strictRedisRateLimiter' in class path resource [com/vyxentra/vehicle/config/RateLimiterConfig.class]
+
+This may be due to missing parameter name information
+
+Action:
+
+Consider marking one of the beans as @Primary, updating the consumer to accept multiple beans, or using @Qualifier to identify the bean that should be consumed
+
+Ensure that your compiler is configured to use the '-parameters' flag.
+You may need to update both your build tool settings as well as your IDE.
+(See https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-6.1-Release-Notes#parameter-name-retention)
+
+
+2026-02-25 22:27:52.939 [main] INFO  c.v.vehicle.ApiGatewayApplication - Starting ApiGatewayApplication using Java 17.0.12 with PID 10288 (D:\Vyxentra\api-gateway\api-gateway\target\classes started by ADMIN in D:\Vyxentra)
+2026-02-25 22:27:52.964 [main] INFO  c.v.vehicle.ApiGatewayApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 22:27:53.069 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:27:53.069 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@57bd2029 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:27:53.069 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:27:53.069 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@796d3c9f uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:27:53.069 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:27:53.069 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@6bff19ff uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:27:56.243 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-25 22:27:56.256 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-25 22:27:56.375 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 46 ms. Found 0 Redis repository interfaces.
+2026-02-25 22:27:57.114 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=001f5a95-d042-3ebd-8818-8be5cd645d0e
+2026-02-25 22:27:57.805 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7147 (http)
+2026-02-25 22:27:57.845 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-25 22:27:57.845 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-25 22:27:59.986 [main] INFO  o.s.b.a.s.r.ReactiveUserDetailsServiceAutoConfiguration - 
+
+Using generated security password: c87c13a6-8cc2-4936-bb30-a595db5f7fa6
+
+2026-02-25 22:28:00.550 [main] WARN  o.s.c.g.c.GatewayClassPathWarningAutoConfiguration - 
+
+**********************************************************
+
+The artifact spring-cloud-gateway-server is deprecated. It will be removed in the next major release. Please add spring-cloud-gateway-server-webflux dependency.
+
+**********************************************************
+
+
+2026-02-25 22:28:02.094 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2026-02-25 22:28:02.096 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2026-02-25 22:28:02.098 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-02-25 22:28:02.505 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2026-02-25 22:28:03.099 [main] INFO  o.s.c.n.e.c.DiscoveryClientOptionalArgsConfiguration - Eureka HTTP Client uses RestTemplate.
+2026-02-25 22:28:03.145 [main] WARN  o.s.c.g.s.w.s.StarterDeprecatedAutoConfiguration - 
+
+**********************************************************
+
+spring-cloud-starter-gateway is deprecated. It will be removed in the next major release. Please use spring-cloud-starter-gateway-server-webflux instead.
+
+**********************************************************
+
+
+2026-02-25 22:28:03.168 [main] WARN  o.s.c.l.c.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-02-25 22:28:03.283 [main] INFO  o.s.c.n.eureka.InstanceInfoFactory - Setting initial instance status as: STARTING
+2026-02-25 22:28:03.337 [main] INFO  c.netflix.discovery.DiscoveryClient - Initializing Eureka in region us-east-1
+2026-02-25 22:28:03.354 [main] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2026-02-25 22:28:03.379 [main] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:28:03.379 [main] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:28:03.379 [main] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:28:03.380 [main] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:28:03.380 [main] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:28:03.380 [main] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: true
+2026-02-25 22:28:03.381 [main] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:28:04.325 [main] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:28:04.328 [main] INFO  c.netflix.discovery.DiscoveryClient - Starting heartbeat executor: renew interval is: 30
+2026-02-25 22:28:04.331 [main] INFO  c.n.discovery.InstanceInfoReplicator - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-02-25 22:28:04.334 [main] INFO  c.netflix.discovery.DiscoveryClient - Discovery Client initialized at timestamp 1772038684334 with initial instances count: 0
+2026-02-25 22:28:04.340 [main] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Registering application API-GATEWAY with eureka with status UP
+2026-02-25 22:28:04.342 [main] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1772038684342, current=UP, previous=STARTING]
+2026-02-25 22:28:04.347 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147: registering service...
+2026-02-25 22:28:04.490 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 7147 (http)
+2026-02-25 22:28:04.491 [main] INFO  o.s.c.n.e.s.EurekaAutoServiceRegistration - Updating port to 7147
+2026-02-25 22:28:04.744 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147 - registration status: 204
+2026-02-25 22:28:05.107 [main] INFO  c.v.vehicle.ApiGatewayApplication - Started ApiGatewayApplication in 14.846 seconds (process running for 16.122)
+2026-02-25 22:28:05.191 [main] WARN  o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: spring.cloud.gateway.httpclient.connect-timeout
+		Line: 21
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.connect-timeout
+	Key: spring.cloud.gateway.httpclient.pool.max-idle-time
+		Line: 25
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-idle-time
+	Key: spring.cloud.gateway.httpclient.pool.max-life-time
+		Line: 26
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.max-life-time
+	Key: spring.cloud.gateway.httpclient.pool.type
+		Line: 24
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.pool.type
+	Key: spring.cloud.gateway.httpclient.response-timeout
+		Line: 22
+		Replacement: spring.cloud.gateway.server.webflux.httpclient.response-timeout
+	Key: spring.cloud.gateway.metrics.enabled
+		Line: 18
+		Replacement: spring.cloud.gateway.server.webflux.metrics.enabled
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2026-02-25 22:28:05.193 [main] ERROR o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that are no longer supported was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: management.endpoint.gateway.enabled
+		Line: 85
+		Reason: Replacement key 'management.endpoint.gateway.access' uses an incompatible target type
+
+
+Please refer to the release notes or reference guide for potential alternatives.
+
+2026-02-25 22:28:05.196 [main] INFO  c.v.vehicle.ApiGatewayApplication - 
+----------------------------------------------------------
+	API Gateway is running!
+	Access URL: http://localhost:7147
+	Profile(s): default
+	Redis Enabled: No
+	Rate Limiting Enabled: false
+	Circuit Breaker Enabled: true
+----------------------------------------------------------
+2026-02-25 22:28:14.344 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:28:14.344 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:28:14.345 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:28:14.345 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:28:14.345 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:28:14.345 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:28:14.345 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:28:14.372 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:28:24.379 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:28:24.380 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:28:24.400 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:28:34.412 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:28:34.412 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:28:34.412 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:28:34.412 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:28:34.413 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:28:34.413 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:28:34.413 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:28:34.424 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:30:19.975 [SpringApplicationShutdownHook] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Unregistering application API-GATEWAY with eureka with status DOWN
+2026-02-25 22:30:19.976 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1772038819976, current=DOWN, previous=UP]
+2026-02-25 22:30:19.976 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147: registering service...
+2026-02-25 22:30:19.981 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-25 22:30:20.001 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147 - registration status: 204
+2026-02-25 22:30:20.047 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-25 22:30:20.084 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...
+2026-02-25 22:30:23.089 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Unregistering ...
+2026-02-25 22:30:23.113 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147 - deregister  status: 200
+2026-02-25 22:30:23.115 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Completed shut down of DiscoveryClient
+2026-02-25 22:36:21.553 [main] INFO  c.v.vehicle.ApiGatewayApplication - Starting ApiGatewayApplication using Java 17.0.12 with PID 18864 (D:\Vyxentra\api-gateway\api-gateway\target\classes started by ADMIN in D:\Vyxentra)
+2026-02-25 22:36:21.594 [main] INFO  c.v.vehicle.ApiGatewayApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-25 22:36:21.712 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:36:21.713 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@781a9412 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:36:21.714 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:36:21.714 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@4303b7f0 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:36:21.715 [main] INFO  o.s.c.c.c.ConfigServerConfigDataLoader - Fetching config from server at : http://localhost:7146/config
+2026-02-25 22:36:21.715 [main] WARN  o.s.c.c.c.ConfigServerConfigDataLoader - Could not locate PropertySource ([ConfigServerConfigDataResource@757529a4 uris = array<String>['http://localhost:7146/config'], optional = true, profiles = 'default']): 401  on GET request for "http://localhost:7146/config/api-gateway/default": [no body]
+2026-02-25 22:36:27.017 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-25 22:36:27.037 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-25 22:36:27.217 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 93 ms. Found 0 Redis repository interfaces.
+2026-02-25 22:36:28.389 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=07c940a0-4f6c-3596-a4f6-8775264b018f
+2026-02-25 22:36:29.180 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 7147 (http)
+2026-02-25 22:36:29.215 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-25 22:36:29.216 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.52]
+2026-02-25 22:36:31.679 [main] INFO  o.s.b.a.s.r.ReactiveUserDetailsServiceAutoConfiguration - 
+
+Using generated security password: 2591c786-a69f-4bfe-9c36-3891b36e3edd
+
+2026-02-25 22:36:34.181 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2026-02-25 22:36:34.181 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2026-02-25 22:36:34.182 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2026-02-25 22:36:34.182 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2026-02-25 22:36:34.182 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2026-02-25 22:36:34.183 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2026-02-25 22:36:34.183 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2026-02-25 22:36:34.183 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2026-02-25 22:36:34.183 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2026-02-25 22:36:34.184 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2026-02-25 22:36:34.184 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2026-02-25 22:36:34.184 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-02-25 22:36:34.185 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2026-02-25 22:36:34.185 [main] INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-02-25 22:36:34.616 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2026-02-25 22:36:35.397 [main] INFO  o.s.c.n.e.c.DiscoveryClientOptionalArgsConfiguration - Eureka HTTP Client uses RestTemplate.
+2026-02-25 22:36:35.468 [main] WARN  o.s.c.l.c.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-02-25 22:36:35.593 [main] INFO  o.s.c.n.eureka.InstanceInfoFactory - Setting initial instance status as: STARTING
+2026-02-25 22:36:35.669 [main] INFO  c.netflix.discovery.DiscoveryClient - Initializing Eureka in region us-east-1
+2026-02-25 22:36:35.684 [main] INFO  c.n.d.s.r.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2026-02-25 22:36:35.708 [main] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:36:35.709 [main] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:36:35.709 [main] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:36:35.710 [main] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:36:35.710 [main] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:36:35.710 [main] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: true
+2026-02-25 22:36:35.711 [main] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:36:36.274 [main] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:36:36.279 [main] INFO  c.netflix.discovery.DiscoveryClient - Starting heartbeat executor: renew interval is: 30
+2026-02-25 22:36:36.284 [main] INFO  c.n.discovery.InstanceInfoReplicator - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-02-25 22:36:36.288 [main] INFO  c.netflix.discovery.DiscoveryClient - Discovery Client initialized at timestamp 1772039196287 with initial instances count: 0
+2026-02-25 22:36:36.294 [main] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Registering application API-GATEWAY with eureka with status UP
+2026-02-25 22:36:36.296 [main] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1772039196296, current=UP, previous=STARTING]
+2026-02-25 22:36:36.301 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147: registering service...
+2026-02-25 22:36:36.396 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147 - registration status: 204
+2026-02-25 22:36:36.420 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 7147 (http)
+2026-02-25 22:36:36.422 [main] INFO  o.s.c.n.e.s.EurekaAutoServiceRegistration - Updating port to 7147
+2026-02-25 22:36:36.991 [main] INFO  c.v.vehicle.ApiGatewayApplication - Started ApiGatewayApplication in 19.049 seconds (process running for 20.853)
+2026-02-25 22:36:37.094 [main] WARN  o.s.b.c.p.m.PropertiesMigrationListener - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yaml]' via location 'optional:classpath:/'':
+	Key: management.metrics.export.prometheus.enabled
+		Line: 85
+		Replacement: management.prometheus.metrics.export.enabled
+	Key: spring.cloud.gateway.metrics.enabled
+		Line: 24
+		Replacement: spring.cloud.gateway.server.webflux.metrics.enabled
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2026-02-25 22:36:37.097 [main] INFO  c.v.vehicle.ApiGatewayApplication - 
+----------------------------------------------------------
+	API Gateway is running!
+	Access URL: http://localhost:7147
+	Profile(s): default
+	Redis Enabled: No
+	Rate Limiting Enabled: false
+	Circuit Breaker Enabled: true
+----------------------------------------------------------
+2026-02-25 22:36:46.280 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:36:46.281 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:36:46.302 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:36:56.305 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:36:56.305 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:36:56.306 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:36:56.306 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:36:56.306 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:36:56.306 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:36:56.306 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:36:56.325 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:37:06.332 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Disable delta property : false
+2026-02-25 22:37:06.332 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2026-02-25 22:37:06.333 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2026-02-25 22:37:06.333 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application is null : false
+2026-02-25 22:37:06.333 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2026-02-25 22:37:06.334 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Application version is -1: false
+2026-02-25 22:37:06.334 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2026-02-25 22:37:06.374 [DiscoveryClient-CacheRefreshExecutor-%d] INFO  c.netflix.discovery.DiscoveryClient - The response status is 200
+2026-02-25 22:40:43.827 [SpringApplicationShutdownHook] INFO  o.s.c.n.e.s.EurekaServiceRegistry - Unregistering application API-GATEWAY with eureka with status DOWN
+2026-02-25 22:40:43.828 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1772039443828, current=DOWN, previous=UP]
+2026-02-25 22:40:43.829 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147: registering service...
+2026-02-25 22:40:43.838 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-25 22:40:43.855 [DiscoveryClient-InstanceInfoReplicator-%d] INFO  c.netflix.discovery.DiscoveryClient - DiscoveryClient_API-GATEWAY/DESKTOP-GJMH3NN.lan:api-gateway:7147 - registration status: 204
+2026-02-25 22:40:43.987 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-25 22:40:44.079 [SpringApplicationShutdownHook] INFO  c.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...

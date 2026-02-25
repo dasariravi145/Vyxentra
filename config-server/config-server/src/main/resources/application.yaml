@@ -1,3 +1,121 @@
 spring:
   application:
     name: config-server
+
+  profiles:
+    active: native,git
+
+  cloud:
+    config:
+      server:
+        # Git backend configuration
+        git:
+          uri: ${CONFIG_REPO_URI:https://github.com/dasariravi145/Vyxentra}
+          default-label: ${CONFIG_REPO_BRANCH:main}
+          search-paths: '{application}'
+          clone-on-start: true
+          force-pull: true
+          timeout: 10
+          refresh-rate: 60
+
+        # Native filesystem backend (for development/fallback)
+        native:
+          search-locations: classpath:/config-repo/,file:${CONFIG_LOCATION:./config-repo}
+
+        # Encrypt/decrypt endpoints
+        encrypt:
+          enabled: true
+
+        # Health check configuration
+        health:
+          enabled: true
+
+  # Security configuration
+  security:
+    user:
+      name: ${CONFIG_SERVER_USERNAME:config-server}
+      password: ${CONFIG_SERVER_PASSWORD:config-server@123}
+      roles: CONFIG_SERVER
+
+  # Encryption configuration
+  encrypt:
+    key-store:
+      location: ${ENCRYPT_KEYSTORE:classpath:keystore/config-server-keystore.jks}
+      password: ${ENCRYPT_KEYSTORE_PASSWORD:changeit}
+      alias: ${ENCRYPT_KEYSTORE_ALIAS:config-server-key}
+    key-strength: 256
+
+# Server configuration
+server:
+  port: ${CONFIG_SERVER_PORT:7146}
+  servlet:
+    context-path: /config
+
+  # SSL Configuration (optional)
+  ssl:
+    enabled: ${SSL_ENABLED:false}
+    key-store: ${SSL_KEYSTORE:classpath:keystore/config-server-keystore.jks}
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:changeit}
+    key-store-type: JKS
+    key-alias: ${SSL_KEY_ALIAS:config-server}
+
+  # Error handling
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: false
+
+# Management endpoints (Actuator)
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,metrics,env,refresh,bus-refresh
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    env:
+      enabled: true
+    metrics:
+      enabled: true
+  health:
+    config:
+      enabled: true
+    diskspace:
+      enabled: true
+    ping:
+      enabled: true
+
+# Logging configuration
+logging:
+  level:
+    com.enterprise.vehicle: ${LOG_LEVEL:DEBUG}
+    org.springframework.cloud.config: INFO
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_PATH:./logs}/config-server.log
+    max-size: 10MB
+    max-history: 30
+  logback:
+    rollingpolicy:
+      max-history: 30
+      max-file-size: 10MB
+
+# Custom configuration for service discovery
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:false}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
