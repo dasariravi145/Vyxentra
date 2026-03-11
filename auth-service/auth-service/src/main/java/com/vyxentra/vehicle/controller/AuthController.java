@@ -1,13 +1,15 @@
 package com.vyxentra.vehicle.controller;
 
-import com.vyxentra.vehicle.dto.request.LoginRequest;
-import com.vyxentra.vehicle.dto.request.OtpVerificationRequest;
+
+import com.vyxentra.vehicle.dto.request.*;
 import com.vyxentra.vehicle.dto.response.ApiResponse;
-import com.vyxentra.vehicle.dto.response.JwtResponse;
+import com.vyxentra.vehicle.dto.response.AuthResponse;
+import com.vyxentra.vehicle.dto.response.TokenResponse;
 import com.vyxentra.vehicle.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,44 +21,67 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        log.info("Registering new user with phone: {}", request.getPhoneNumber());
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, "Registration successful. OTP sent."));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody LoginRequest request) {
-        log.info("Login request received for mobile: {}", request.getMobileNumber());
-        authService.sendOtp(request);
-        return ResponseEntity.ok(ApiResponse.success("OTP sent successfully", null));
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        log.info("Login attempt for phone: {}", request.getPhoneNumber());
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse<JwtResponse>> verifyOtp(
-            @Valid @RequestBody OtpVerificationRequest request) {
-        log.info("OTP verification request for mobile: {}", request.getMobileNumber());
-        JwtResponse response = authService.verifyOtp(request);
-        return ResponseEntity.ok(ApiResponse.success("OTP verified successfully", response));
+    public ResponseEntity<ApiResponse<TokenResponse>> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        log.info("OTP verification for phone: {}", request.getPhoneNumber());
+        TokenResponse response = authService.verifyOtp(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "OTP verified successfully"));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<JwtResponse>> refreshToken(
-            @RequestHeader("Authorization") String refreshToken) {
-        log.info("Token refresh request received");
-        String token = refreshToken.substring(7);
-        JwtResponse response = authService.refreshToken(token);
-        return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody ResendOtpRequest request) {
+        log.info("Resending OTP for phone: {}", request.getPhoneNumber());
+        authService.resendOtp(request);
+        return ResponseEntity.ok(ApiResponse.success(null, "OTP resent successfully"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<TokenResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        log.info("Refreshing token");
+        TokenResponse response = authService.refreshToken(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "Token refreshed successfully"));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String token) {
-        log.info("Logout request received");
-        String jwtToken = token.substring(7);
-        authService.logout(jwtToken);
-        return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("X-User-ID") String userId) {
+        log.info("Logout for user: {}", userId);
+        authService.logout(userId);
+        return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<ApiResponse<Boolean>> validateToken(
-            @RequestHeader("Authorization") String token) {
-        String jwtToken = token.substring(7);
-        boolean isValid = authService.validateToken(jwtToken);
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        log.info("Forgot password for phone: {}", request.getPhoneNumber());
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(null, "Password reset OTP sent"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Resetting password for phone: {}", request.getPhoneNumber());
+        authService.resetPassword(request);
+        return ResponseEntity.ok(ApiResponse.success(null, "Password reset successful"));
+    }
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<ApiResponse<Boolean>> validateToken(@RequestParam String token) {
+        log.debug("Validating token");
+        boolean isValid = authService.validateToken(token);
         return ResponseEntity.ok(ApiResponse.success(isValid));
     }
 }
-

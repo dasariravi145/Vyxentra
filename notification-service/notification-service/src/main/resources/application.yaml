@@ -1,3 +1,188 @@
-spring:
-  application:
-    name: notification-service
+server:
+  port: 7149
+  shutdown: graceful
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+  datasource:
+  url: ${DB_URL:jdbc:postgresql://localhost:5432/vyxentra_notificationdb}
+  username: ${DB_USERNAME:postgres}
+  password: ${DB_PASSWORD:admin@123}
+  driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 20
+    minimum-idle: 5
+    idle-timeout: 300000
+    connection-timeout: 30000
+    max-lifetime: 600000
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+    show-sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.vehicle.common.events
+        spring.json.type.mapping: event:com.vehicle.common.events.BaseEvent
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  mail:
+    host: ${MAIL_HOST:smtp.sendgrid.net}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:apikey}
+    password: ${MAIL_PASSWORD:${SENDGRID_API_KEY}}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  thymeleaf:
+    prefix: classpath:/templates/email/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+
+# Twilio Configuration
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID:}
+  auth-token: ${TWILIO_AUTH_TOKEN:}
+  phone-number: ${TWILIO_PHONE_NUMBER:+1234567890}
+
+# SendGrid Configuration
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:}
+  from-email: ${SENDGRID_FROM_EMAIL:noreply@vehicle-service.com}
+  from-name: ${SENDGRID_FROM_NAME:Vehicle Service Platform}
+
+# Firebase Configuration
+firebase:
+  service-account-file: ${FIREBASE_SERVICE_ACCOUNT_FILE:classpath:firebase-service-account.json}
+  database-url: ${FIREBASE_DATABASE_URL:}
+
+# Notification Configuration
+notification:
+  retry:
+    max-attempts: ${NOTIFICATION_RETRY_ATTEMPTS:3}
+    initial-delay-ms: ${NOTIFICATION_RETRY_DELAY:1000}
+    max-delay-ms: ${NOTIFICATION_MAX_DELAY:10000}
+  batch:
+    size: ${NOTIFICATION_BATCH_SIZE:50}
+    interval-ms: ${NOTIFICATION_BATCH_INTERVAL:5000}
+  sms:
+    enabled: ${SMS_ENABLED:true}
+    provider: ${SMS_PROVIDER:twilio}
+  email:
+    enabled: ${EMAIL_ENABLED:true}
+    provider: ${EMAIL_PROVIDER:sendgrid}
+  push:
+    enabled: ${PUSH_ENABLED:true}
+    provider: ${PUSH_PROVIDER:firebase}
+
+# Eureka Configuration
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:7145/eureka}
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    prefer-ip-address: true
+
+# Resilience4j Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      twilio:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+      sendgrid:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+      firebase:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+  retry:
+    instances:
+      sms:
+        max-attempts: 3
+        wait-duration: 1000
+      email:
+        max-attempts: 3
+        wait-duration: 1000
+      push:
+        max-attempts: 3
+        wait-duration: 1000
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# Logging
+logging:
+  level:
+    com.vehicle.notification: DEBUG
+    com.twilio: INFO
+    com.sendgrid: INFO
+    com.google.firebase: INFO
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/notification-service.log
+    max-size: 100MB
+    max-history: 30

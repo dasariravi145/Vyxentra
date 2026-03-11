@@ -1,0 +1,23 @@
+package com.vyxentra.vehicle.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+import java.util.Map;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public  class VerificationHistory {
+    private String historyId;
+    private String action; // UPLOADED, VERIFIED, REJECTED, RE-UPLOADED, EXPIRED
+    private String performedBy;
+    private String performedByName;
+    private Instant performedAt;
+    private String remarks;
+    private Map<String, Object> changes;
+}

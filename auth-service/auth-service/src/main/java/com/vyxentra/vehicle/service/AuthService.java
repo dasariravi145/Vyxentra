@@ -1,33 +1,27 @@
 package com.vyxentra.vehicle.service;
 
-import com.vyxentra.vehicle.dto.request.LoginRequest;
-import com.vyxentra.vehicle.dto.request.OtpVerificationRequest;
-import com.vyxentra.vehicle.dto.response.JwtResponse;
+
+import com.vyxentra.vehicle.dto.request.*;
+import com.vyxentra.vehicle.dto.response.AuthResponse;
+import com.vyxentra.vehicle.dto.response.TokenResponse;
 
 public interface AuthService {
 
-    /**
-     * Send OTP to user's mobile number
-     */
-    void sendOtp(LoginRequest request);
+    AuthResponse register(RegisterRequest request);
 
-    /**
-     * Verify OTP and generate JWT token
-     */
-    JwtResponse verifyOtp(OtpVerificationRequest request);
+    AuthResponse login(LoginRequest request);
 
-    /**
-     * Refresh JWT token using refresh token
-     */
-    JwtResponse refreshToken(String refreshToken);
+    TokenResponse verifyOtp(VerifyOtpRequest request);
 
-    /**
-     * Logout user and invalidate tokens
-     */
-    void logout(String token);
+    void resendOtp(ResendOtpRequest request);
 
-    /**
-     * Validate JWT token
-     */
+    TokenResponse refreshToken(RefreshTokenRequest request);
+
+    void logout(String userId);
+
+    void forgotPassword(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
+
     boolean validateToken(String token);
 }

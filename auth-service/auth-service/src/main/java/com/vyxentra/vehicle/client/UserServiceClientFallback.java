@@ -1,35 +1,17 @@
 package com.vyxentra.vehicle.client;
 
-import com.vyxentra.vehicle.dto.request.UserRegistrationRequest;
-import com.vyxentra.vehicle.dto.response.UserResponse;
+import com.vyxentra.vehicle.dto.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-class UserServiceClientFallback implements UserServiceClient {
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceClientFallback.class);
+public class UserServiceClientFallback implements UserServiceClient {
 
     @Override
-    public UserResponse getUserByMobile(String countryCode, String mobileNumber) {
-        log.error("Fallback: getUserByMobile failed for {}{}", countryCode, mobileNumber);
-        throw new RuntimeException("User service is temporarily unavailable");
-    }
-
-    @Override
-    public UserResponse getUserById(String userId) {
-        log.error("Fallback: getUserById failed for {}", userId);
-        throw new RuntimeException("User service is temporarily unavailable");
-    }
-
-    @Override
-    public UserResponse createUser(UserRegistrationRequest request) {
-        log.error("Fallback: createUser failed for {}", request.getMobileNumber());
-        throw new RuntimeException("User service is temporarily unavailable");
-    }
-
-    @Override
-    public void updateDeviceInfo(String userId, String deviceId, String fcmToken) {
-        log.error("Fallback: updateDeviceInfo failed for {}", userId);
-        throw new RuntimeException("User service is temporarily unavailable");
+    public ApiResponse<UserDetails> loadUserByUserId(String userId) {
+        log.error("Fallback: Unable to load user details for user: {}", userId);
+        return ApiResponse.error(null, "User service is currently unavailable");
     }
 }

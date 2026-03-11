@@ -1,14 +1,14 @@
 package com.vyxentra.vehicle.exceptions;
 
-import org.springframework.http.HttpStatus;
 
-public class UnauthorizedException extends BusinessException {
+
+public class UnauthorizedException extends RuntimeException {
 
     public UnauthorizedException(String message) {
-        super(message, "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        super(message);
     }
 
-    public UnauthorizedException() {
-        super("Authentication required", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+    public UnauthorizedException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

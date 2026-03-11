@@ -1,3 +1,175 @@
-spring:
-  application:
-    name: payment-service
+server:
+  port: 7155
+  shutdown: graceful
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+
+    datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/vyxentra_paymentdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin@123}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 30000
+      max-lifetime: 600000
+
+  spring:
+    jpa:
+      hibernate:
+        ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          jdbc:
+            batch_size: 20
+      show-sql: true
+
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: event:com.vehicle.common.events.BaseEvent
+    consumer:
+      group-id: payment-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.vehicle.common.events
+        spring.json.type.mapping: event:com.vehicle.common.events.BaseEvent
+
+# Payment Gateway Configuration
+payment:
+  gateway:
+    default: ${PAYMENT_GATEWAY:razorpay}
+    razorpay:
+      key-id: ${RAZORPAY_KEY_ID:rzp_test_xxxxxx}
+      key-secret: ${RAZORPAY_KEY_SECRET:xxxxxx}
+      webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:xxxxxx}
+    stripe:
+      api-key: ${STRIPE_API_KEY:sk_test_xxxxxx}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:xxxxxx}
+    payu:
+      merchant-key: ${PAYU_MERCHANT_KEY:xxxxxx}
+      merchant-salt: ${PAYU_MERCHANT_SALT:xxxxxx}
+
+  commission:
+    percentage: ${COMMISSION_PERCENTAGE:15}
+    service-center: ${SERVICE_CENTER_COMMISSION:15}
+    washing-center: ${WASHING_CENTER_COMMISSION:10}
+    minimum: ${MINIMUM_COMMISSION:10}
+
+  settlement:
+    provider-settlement-days: ${PROVIDER_SETTLEMENT_DAYS:3}
+    minimum-payout: ${MINIMUM_PAYOUT:100}
+    auto-settle: ${AUTO_SETTLE:true}
+
+  wallet:
+    enabled: ${WALLET_ENABLED:true}
+    max-balance: ${MAX_WALLET_BALANCE:50000}
+    min-topup: ${MIN_WALLET_TOPUP:100}
+
+  refund:
+    auto-approve-below: ${REFUND_AUTO_APPROVE_BELOW:500}
+    max-refund-days: ${MAX_REFUND_DAYS:7}
+
+# Eureka Configuration
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:7145/eureka}
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    prefer-ip-address: true
+
+# Resilience4j Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      bookingService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+      notificationService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+  retry:
+    instances:
+      razorpayGateway:
+        max-attempts: 3
+        wait-duration: 1000
+      stripeGateway:
+        max-attempts: 3
+        wait-duration: 1000
+
+# Feign Client Configuration
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+  circuitbreaker:
+    enabled: true
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# Logging
+logging:
+  level:
+    com.vehicle.payment: DEBUG
+    com.razorpay: INFO
+    com.stripe: INFO
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/payment-service.log
+    max-size: 100MB
+    max-history: 30

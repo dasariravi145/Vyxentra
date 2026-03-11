@@ -1,210 +1,407 @@
 package com.vyxentra.vehicle.service;
 
 import com.vyxentra.vehicle.client.UserServiceClient;
-import com.vyxentra.vehicle.constants.ErrorCodes;
-import com.vyxentra.vehicle.dto.request.LoginRequest;
-import com.vyxentra.vehicle.dto.request.OtpVerificationRequest;
-import com.vyxentra.vehicle.dto.request.UserRegistrationRequest;
-import com.vyxentra.vehicle.dto.response.JwtResponse;
-import com.vyxentra.vehicle.dto.response.UserResponse;
-import com.vyxentra.vehicle.enums.UserRole;
-import com.vyxentra.vehicle.enums.UserStatus;
-import com.vyxentra.vehicle.event.OtpSentEvent;
-import com.vyxentra.vehicle.events.BaseEvent;
+import com.vyxentra.vehicle.constants.ServiceConstants;
+import com.vyxentra.vehicle.dto.request.*;
+import com.vyxentra.vehicle.dto.response.AuthResponse;
+import com.vyxentra.vehicle.dto.response.TokenResponse;
+import com.vyxentra.vehicle.entity.RefreshToken;
+import com.vyxentra.vehicle.entity.User;
+import com.vyxentra.vehicle.enums.Role;
 import com.vyxentra.vehicle.exceptions.BusinessException;
-import com.vyxentra.vehicle.exceptions.UnauthorizedException;
-import com.vyxentra.vehicle.util.IdGenerator;
-import com.vyxentra.vehicle.util.ValidationUtil;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
-import lombok.Builder;
+import com.vyxentra.vehicle.exceptions.ErrorCode;
+import com.vyxentra.vehicle.exceptions.ResourceNotFoundException;
+import com.vyxentra.vehicle.repository.RefreshTokenRepository;
+import com.vyxentra.vehicle.repository.UserRepository;
+import com.vyxentra.vehicle.utils.CorrelationIdUtil;
+import com.vyxentra.vehicle.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-@Builder
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final OtpService otpService;
+    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final TokenBlacklistService tokenBlacklistService;
+    private final OtpService otpService;
+    private final AuthenticationManager authenticationManager;
     private final UserServiceClient userServiceClient;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Value("${otp.expiry-seconds:300}")
+    private int otpExpirySeconds;
+
+    @Value("${otp.max-attempts:3}")
+    private int maxOtpAttempts;
+
+    @Value("${jwt.refresh-expiration:604800000}")
+    private long refreshExpirationMs;
 
     @Override
-    public void sendOtp(LoginRequest request) {
-        ValidationUtil.validateMobileNumber(request.getMobileNumber());
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+        log.info("Registering new user with phone: {}", request.getPhoneNumber());
 
-        // Check if user exists and is active
-        try {
-            UserResponse user = userServiceClient.getUserByMobile(
-                    request.getCountryCode(), request.getMobileNumber());
-
-            if (user.getStatus() != UserStatus.ACTIVE) {
-                log.warn("Inactive user attempted login: {}", request.getMobileNumber());
-                throw new BusinessException("Account is not active", ErrorCodes.USER_INACTIVE);
-            }
-        } catch (Exception e) {
-            // User not found - will be created during registration
-            log.info("New user registration flow for: {}", request.getMobileNumber());
+        // Validate phone and email uniqueness
+        if (userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new BusinessException(ErrorCode.USER_ALREADY_EXISTS, "Phone number already registered");
         }
 
-        // Generate and store OTP
-        String otp = otpService.generateAndStoreOtp(request.getMobileNumber());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException(ErrorCode.USER_ALREADY_EXISTS, "Email already registered");
+        }
 
-        // In production, integrate with SMS service
-        log.info("OTP for {}: {}", request.getMobileNumber(), otp);
+        // Validate provider rules
+        if (request.getRole() == Role.PROVIDER) {
+            validateProviderRegistration(request);
+        }
 
-        // Send notification event
-        sendNotificationEvent(request.getMobileNumber(), otp);
+        // Create user
+        User user = User.builder()
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .role(request.getRole())
+                .enabled(true)
+                .accountNonLocked(true)
+                .failedAttempts(0)
+                .build();
+
+        // Set password if provided (for email/password login)
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        // Set provider fields
+        if (request.getRole() == Role.PROVIDER) {
+            user.setBusinessName(request.getBusinessName());
+            user.setGstNumber(request.getGstNumber());
+            user.setAddress(request.getAddress());
+            user.setLatitude(request.getLatitude());
+            user.setLongitude(request.getLongitude());
+            user.setSupportsBike(request.getSupportsBike());
+            user.setSupportsCar(request.getSupportsCar());
+            user.setProviderStatus("PENDING_APPROVAL"); // Admin approval required
+        }
+
+        user = userRepository.save(user);
+
+        // Generate and send OTP
+        String otp = otpService.generateAndSendOtp(request.getPhoneNumber());
+
+        log.info("User registered successfully with ID: {}", user.getId());
+
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .role(user.getRole())
+                .otpSent(true)
+                .message("Registration successful. Please verify OTP.")
+                .businessName(user.getBusinessName())
+                .providerStatus(user.getProviderStatus() != null ?
+                        AuthResponse.ProviderStatus.valueOf(user.getProviderStatus()) : null)
+                .build();
+    }
+
+    @Override
+    public AuthResponse login(LoginRequest request) {
+        log.info("Processing login for phone: {}", request.getPhoneNumber());
+
+        User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "phone", request.getPhoneNumber()));
+
+        // Check if account is locked
+        if (!user.isAccountNonLocked()) {
+            if (user.getLockTime() != null &&
+                    user.getLockTime()
+                            .plus(30, java.time.temporal.ChronoUnit.MINUTES)
+                            .isBefore(Instant.now())) {
+
+                // Unlock account after 30 minutes
+                userRepository.resetFailedAttempts(user.getPhoneNumber());
+
+            } else {
+                throw new BusinessException(
+                        ErrorCode.UNAUTHORIZED,
+                        "Account is locked. Try again after 30 minutes."
+                );
+            }
+        }
+
+        // Check provider status
+        if (user.getRole() == Role.PROVIDER) {
+            if ("SUSPENDED".equals(user.getProviderStatus())) {
+                throw new BusinessException(ErrorCode.PROVIDER_SUSPENDED);
+            }
+            if (!"ACTIVE".equals(user.getProviderStatus())) {
+                throw new BusinessException(ErrorCode.PROVIDER_NOT_APPROVED);
+            }
+        }
+
+        // Verify OTP
+        boolean isValid = otpService.verifyOtp(request.getPhoneNumber(), request.getOtp());
+
+        if (!isValid) {
+            // Increment failed attempts
+            user.setFailedAttempts(user.getFailedAttempts() + 1);
+
+            if (user.getFailedAttempts() >= maxOtpAttempts) {
+                userRepository.lockUser(Instant.now(), user.getPhoneNumber());
+                log.warn("User account locked due to multiple failed attempts: {}", user.getPhoneNumber());
+            } else {
+                userRepository.save(user);
+            }
+
+            throw new BusinessException(ErrorCode.OTP_INVALID);
+        }
+
+        // Reset failed attempts on successful login
+        userRepository.resetFailedAttempts(user.getPhoneNumber());
+
+        // Generate tokens
+        TokenResponse tokens = generateTokens(user);
+
+        // Update last login
+        userRepository.updateLastLogin(user.getId(), Instant.now(),
+                CorrelationIdUtil.getCurrentCorrelationId());
+
+        log.info("User logged in successfully: {}", user.getId());
+
+        return AuthResponse.builder()
+                .userId(user.getId())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .role(user.getRole())
+                .tokens(tokens)
+                .businessName(user.getBusinessName())
+                .providerStatus(user.getProviderStatus() != null ?
+                        AuthResponse.ProviderStatus.valueOf(user.getProviderStatus()) : null)
+                .build();
     }
 
     @Override
     @Transactional
-    @CircuitBreaker(name = "userService", fallbackMethod = "verifyOtpFallback")
-    @Retry(name = "userService")
-    public JwtResponse verifyOtp(OtpVerificationRequest request) {
-        ValidationUtil.validateMobileNumber(request.getMobileNumber());
-        ValidationUtil.validateOtp(request.getOtp());
+    public TokenResponse verifyOtp(VerifyOtpRequest request) {
+        log.info("Verifying OTP for phone: {}", request.getPhoneNumber());
 
-        // Verify OTP
-        boolean isValid = otpService.verifyOtp(request.getMobileNumber(), request.getOtp());
+        User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "phone", request.getPhoneNumber()));
+
+        boolean isValid = otpService.verifyOtp(request.getPhoneNumber(), request.getOtp());
+
         if (!isValid) {
-            throw new BusinessException("Invalid OTP", ErrorCodes.AUTH_INVALID_OTP);
-        }
-
-        // Get or create user
-        UserResponse user;
-        try {
-            user = userServiceClient.getUserByMobile(request.getCountryCode(), request.getMobileNumber());
-        } catch (Exception e) {
-            // Create new user
-            user = userServiceClient.createUser(UserRegistrationRequest.builder()
-                    .mobileNumber(request.getMobileNumber())
-                    .countryCode(request.getCountryCode())
-                    .build());
-        }
-
-        // Check user status
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new BusinessException("Account is not active", ErrorCodes.USER_INACTIVE);
+            throw new BusinessException(ErrorCode.OTP_INVALID);
         }
 
         // Generate tokens
-        Set<UserRole> roles = user.getRoles();
-        String token = jwtService.generateToken(user.getId(), user.getMobileNumber(), roles);
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getMobileNumber());
+        TokenResponse tokens = generateTokens(user);
 
-        // Update device info
-        if (request.getDeviceId() != null) {
-            userServiceClient.updateDeviceInfo(user.getId(), request.getDeviceId(), request.getFcmToken());
+        // Enable user if not enabled
+        if (!user.isEnabled()) {
+            user.setEnabled(true);
+            userRepository.save(user);
         }
 
-        // Clear OTP after successful verification
-        otpService.clearOtp(request.getMobileNumber());
+        log.info("OTP verified successfully for user: {}", user.getId());
 
-        log.info("User authenticated successfully: {}", user.getId());
+        return tokens;
+    }
 
-        return JwtResponse.builder()
-                .token(token)
-                .refreshToken(refreshToken)
-                .expiresIn(jwtService.getExpirationTime())
-                .userId(user.getId())
-                .mobileNumber(user.getMobileNumber())
-                .roles(roles)
-                .profileComplete(user.isEmailVerified()) // Simplified check
-                .build();
+    @Override
+    public void resendOtp(ResendOtpRequest request) {
+        log.info("Resending OTP for phone: {}", request.getPhoneNumber());
+
+        // Check cooldown
+        String cooldownKey = ServiceConstants.OTP_CACHE_PREFIX + "cooldown:" + request.getPhoneNumber();
+        Boolean hasCooldown = redisTemplate.hasKey(cooldownKey);
+
+        if (Boolean.TRUE.equals(hasCooldown)) {
+            throw new BusinessException(ErrorCode.OTP_MAX_ATTEMPTS, "Please wait before requesting another OTP");
+        }
+
+        otpService.generateAndSendOtp(request.getPhoneNumber());
+
+        // Set cooldown
+        redisTemplate.opsForValue().set(cooldownKey, "1", 60, TimeUnit.SECONDS);
+
+        log.info("OTP resent successfully for phone: {}", request.getPhoneNumber());
     }
 
     @Override
     @Transactional
-    public JwtResponse refreshToken(String refreshToken) {
-        if (!jwtService.validateToken(refreshToken)) {
-            throw new UnauthorizedException("Invalid refresh token");
+    public TokenResponse refreshToken(RefreshTokenRequest request) {
+        log.info("Refreshing token");
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+                .orElseThrow(() -> new BusinessException(ErrorCode.UNAUTHORIZED, "Invalid refresh token"));
+
+        if (refreshToken.isRevoked() || refreshToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh token expired");
         }
 
-        String userId = jwtService.extractUserId(refreshToken);
-        String mobileNumber = jwtService.extractMobileNumber(refreshToken);
-
-        // Check if token is blacklisted
-        if (tokenBlacklistService.isBlacklisted(refreshToken)) {
-            throw new UnauthorizedException("Token has been revoked");
-        }
-
-        // Get user to verify roles haven't changed
-        UserResponse user = userServiceClient.getUserById(userId);
+        User user = userRepository.findById(refreshToken.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", refreshToken.getUserId()));
 
         // Generate new tokens
-        String newToken = jwtService.generateToken(userId, mobileNumber, user.getRoles());
-        String newRefreshToken = jwtService.generateRefreshToken(userId, mobileNumber);
+        String newAccessToken = jwtService.generateToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
 
-        // Blacklist old refresh token
-        tokenBlacklistService.blacklistToken(refreshToken, jwtService.getExpirationDate(refreshToken));
+        // Revoke old refresh token
+        refreshToken.setRevoked(true);
+        refreshToken.setRevokedAt(Instant.now());
+        refreshTokenRepository.save(refreshToken);
 
-        log.info("Token refreshed for user: {}", userId);
+        // Save new refresh token
+        saveRefreshToken(user.getId(), newRefreshToken);
 
-        return JwtResponse.builder()
-                .token(newToken)
+        log.info("Token refreshed successfully for user: {}", user.getId());
+
+        return TokenResponse.builder()
+                .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
-                .expiresIn(jwtService.getExpirationTime())
-                .userId(userId)
-                .mobileNumber(mobileNumber)
-                .roles(user.getRoles())
-                .profileComplete(user.isEmailVerified())
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getExpirationMs())
+                .userId(user.getId())
+                .role(user.getRole().name())
+                .suspended("SUSPENDED".equals(user.getProviderStatus()))
                 .build();
     }
 
     @Override
     @Transactional
-    public void logout(String token) {
-        if (token != null && !token.isEmpty()) {
-            Date expiration = jwtService.getExpirationDate(token);
-            tokenBlacklistService.blacklistToken(token, expiration);
+    public void logout(String userId) {
+        log.info("Logging out user: {}", userId);
 
-            String userId = jwtService.extractUserId(token);
-            log.info("User logged out: {}", userId);
+        // Revoke all refresh tokens
+        refreshTokenRepository.revokeAllUserTokens(userId);
+
+        // Clear security context
+        SecurityContextHolder.clearContext();
+
+        log.info("User logged out successfully: {}", userId);
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordRequest request) {
+        log.info("Processing forgot password for phone: {}", request.getPhoneNumber());
+
+        User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "phone", request.getPhoneNumber()));
+
+        // Generate and send OTP
+        otpService.generateAndSendOtp(request.getPhoneNumber());
+
+        log.info("Password reset OTP sent for user: {}", user.getId());
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        log.info("Resetting password for phone: {}", request.getPhoneNumber());
+
+        User user = userRepository.findByPhoneNumber(request.getPhoneNumber())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "phone", request.getPhoneNumber()));
+
+        // Verify OTP
+        boolean isValid = otpService.verifyOtp(request.getPhoneNumber(), request.getOtp());
+
+        if (!isValid) {
+            throw new BusinessException(ErrorCode.OTP_INVALID);
         }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Revoke all existing tokens
+        refreshTokenRepository.revokeAllUserTokens(user.getId());
+
+        log.info("Password reset successfully for user: {}", user.getId());
     }
 
     @Override
     public boolean validateToken(String token) {
-        if (token == null || token.isEmpty()) {
-            return false;
-        }
-
-        if (tokenBlacklistService.isBlacklisted(token)) {
-            return false;
-        }
-
-        return jwtService.validateToken(token);
-    }
-
-    private void sendNotificationEvent(String mobileNumber, String otp) {
         try {
-            OtpSentEvent event = OtpSentEvent.builder()
-                    .eventId(IdGenerator.generateEventId())
-                    .eventType("OTP_SENT")
-                    .timestamp(Instant.now())
-                    .build();
+            String userId = jwtService.extractUserId(token);
+            if (userId == null) {
+                return false;
+            }
 
-            kafkaTemplate.send("notification-events", mobileNumber, event);
+            UserDetails userDetails =(UserDetails) userServiceClient.loadUserByUserId(userId);
+            return jwtService.isTokenValid(token, userDetails);
         } catch (Exception e) {
-            log.error("Failed to send notification event", e);
+            log.error("Token validation failed: {}", e.getMessage());
+            return false;
         }
     }
 
-    private JwtResponse verifyOtpFallback(OtpVerificationRequest request, Exception e) {
-        log.error("Fallback for verifyOtp: {}", e.getMessage());
-        throw new BusinessException("Authentication service is temporarily unavailable. Please try again later.");
+    private TokenResponse generateTokens(User user) {
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        // Save refresh token
+        saveRefreshToken(user.getId(), refreshToken);
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getExpirationMs())
+                .userId(user.getId())
+                .role(user.getRole().name())
+                .suspended("SUSPENDED".equals(user.getProviderStatus()))
+                .build();
+    }
+
+    private void saveRefreshToken(String userId, String token) {
+        RefreshToken refreshToken = RefreshToken.builder()
+                .token(token)
+                .userId(userId)
+                .expiryDate(Instant.now().plusMillis(refreshExpirationMs))
+                .revoked(false)
+                .createdAt(Instant.now())
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+    }
+
+    private void validateProviderRegistration(RegisterRequest request) {
+        if (request.getBusinessName() == null || request.getBusinessName().trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Business name is required for providers");
+        }
+
+        if (request.getGstNumber() == null || request.getGstNumber().trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "GST number is required for providers");
+        }
+
+        if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Address is required for providers");
+        }
+
+        ValidationUtil.validateCoordinates(request.getLatitude(), request.getLongitude());
+
+        // Must support at least one vehicle type
+        if (!Boolean.TRUE.equals(request.getSupportsBike()) &&
+                !Boolean.TRUE.equals(request.getSupportsCar())) {
+            throw new BusinessException(ErrorCode.PROVIDER_INVALID_VEHICLE_SUPPORT);
+        }
     }
 }
-

@@ -6,6 +6,5 @@ public enum ProviderStatus {
     ACTIVE,
     SUSPENDED,
     INACTIVE,
-    REJECTED,
-    CLOSED
+    REJECTED
 }

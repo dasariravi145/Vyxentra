@@ -14,13 +14,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
-
     private boolean success;
     private String message;
     private T data;
-    private String errorCode;
+    private ErrorResponse error;
     private Instant timestamp;
-    private String path;
+    private String correlationId;
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
@@ -30,28 +29,28 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> success(String message, T data) {
+    public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .success(true)
-                .message(message)
                 .data(data)
-                .timestamp(Instant.now())
-                .build();
-    }
-
-    public static <T> ApiResponse<T> error(String message) {
-        return ApiResponse.<T>builder()
-                .success(false)
                 .message(message)
                 .timestamp(Instant.now())
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, String errorCode) {
+    public static <T> ApiResponse<T> error(ErrorResponse error) {
         return ApiResponse.<T>builder()
                 .success(false)
+                .error(error)
+                .timestamp(Instant.now())
+                .build();
+    }
+
+    public static <T> ApiResponse<T> error(ErrorResponse error, String message) {
+        return ApiResponse.<T>builder()
+                .success(false)
+                .error(error)
                 .message(message)
-                .errorCode(errorCode)
                 .timestamp(Instant.now())
                 .build();
     }

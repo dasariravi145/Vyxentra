@@ -1,173 +1,159 @@
 package com.vyxentra.vehicle.exceptions;
-import com.vyxentra.vehicle.dto.response.ErrorResponse;
+
+
 import com.vyxentra.vehicle.dto.response.ValidationError;
+import com.vyxentra.vehicle.dto.response.ApiResponse;
+import com.vyxentra.vehicle.dto.response.ErrorResponse;
+import com.vyxentra.vehicle.utils.CorrelationIdUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
-            BusinessException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(
+            BusinessException ex, HttpServletRequest request) {
+        log.error("Business exception: {}", ex.getMessage());
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Business Exception: {} | RequestId: {}", ex.getMessage(), requestId, ex);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(ex.getHttpStatus() != null ? ex.getHttpStatus().value() : HttpStatus.BAD_REQUEST.value())
-                .error(ex.getErrorCode())
+        ErrorResponse error = ErrorResponse.builder()
+                .code(ex.getErrorCode().getCode())
                 .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse,
-                ex.getHttpStatus() != null ? ex.getHttpStatus() : HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(error));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
-            ResourceNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(
+            ResourceNotFoundException ex, HttpServletRequest request) {
+        log.error("Resource not found: {}", ex.getMessage());
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Resource Not Found: {} | RequestId: {}", ex.getMessage(), requestId);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error("RESOURCE_NOT_FOUND")
+        ErrorResponse error = ErrorResponse.builder()
+                .code("VEH-1004")
                 .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(error));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(
-            UnauthorizedException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleUnauthorized(
+            UnauthorizedException ex, HttpServletRequest request) {
+        log.error("Unauthorized access: {}", ex.getMessage());
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Unauthorized: {} | RequestId: {}", ex.getMessage(), requestId);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .error("UNAUTHORIZED")
+        ErrorResponse error = ErrorResponse.builder()
+                .code("VEH-1002")
                 .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(error));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleValidationErrors(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+        log.error("Validation error: {}", ex.getMessage());
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Validation Error: {} | RequestId: {}", ex.getMessage(), requestId);
+        List<ValidationError> validationErrors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> {
+                    ValidationError validationError = new ValidationError();
+                    if (error instanceof FieldError) {
+                        FieldError fieldError = (FieldError) error;
+                        validationError.setField(fieldError.getField());
+                        validationError.setRejectedValue(fieldError.getRejectedValue());
+                    }
+                    validationError.setMessage(error.getDefaultMessage());
+                    return validationError;
+                })
+                .collect(Collectors.toList());
 
-        List<ValidationError> validationErrors = new ArrayList<>();
-
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            Object rejectedValue = ((FieldError) error).getRejectedValue();
-
-            validationErrors.add(ValidationError.builder()
-                    .field(fieldName)
-                    .message(errorMessage)
-                    .rejectedValue(rejectedValue)
-                    .build());
-        });
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("VALIDATION_FAILED")
-                .message("Validation failed for request parameters")
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+        ErrorResponse error = ErrorResponse.builder()
+                .code("VEH-1001")
+                .message("Validation failed")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
                 .validationErrors(validationErrors)
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(error));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
-            ConstraintViolationException ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+        log.error("Constraint violation: {}", ex.getMessage());
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Constraint Violation: {} | RequestId: {}", ex.getMessage(), requestId);
+        List<ValidationError> validationErrors = ex.getConstraintViolations()
+                .stream()
+                .map(violation -> ValidationError.builder()
+                        .field(violation.getPropertyPath().toString())
+                        .message(violation.getMessage())
+                        .rejectedValue(violation.getInvalidValue())
+                        .build())
+                .collect(Collectors.toList());
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("CONSTRAINT_VIOLATION")
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+        ErrorResponse error = ErrorResponse.builder()
+                .code("VEH-1001")
+                .message("Validation failed")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .validationErrors(validationErrors)
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DistributedLockException.class)
-    public ResponseEntity<ErrorResponse> handleDistributedLockException(
-            DistributedLockException ex, WebRequest request) {
-
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Lock Acquisition Failed: {} | RequestId: {}", ex.getMessage(), requestId);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.CONFLICT.value())
-                .error("LOCK_ACQUISITION_FAILED")
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(error));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex, WebRequest request) {
+    public ResponseEntity<ApiResponse<Void>> handleGenericException(
+            Exception ex, HttpServletRequest request) {
+        log.error("Unexpected error", ex);
 
-        String requestId = UUID.randomUUID().toString();
-        logger.error("Unhandled Exception: {} | RequestId: {}", ex.getMessage(), requestId, ex);
-
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(Instant.now().toString())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("INTERNAL_SERVER_ERROR")
-                .message("An unexpected error occurred. Please try again later.")
-                .path(request.getDescription(false).replace("uri=", ""))
-                .requestId(requestId)
+        ErrorResponse error = ErrorResponse.builder()
+                .code("VEH-1000")
+                .message("An unexpected error occurred")
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(error));
     }
 }

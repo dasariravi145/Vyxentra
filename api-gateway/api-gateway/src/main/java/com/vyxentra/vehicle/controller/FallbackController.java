@@ -1,7 +1,11 @@
 package com.vyxentra.vehicle.controller;
 
 
+
 import com.vyxentra.vehicle.dto.response.ApiResponse;
+import com.vyxentra.vehicle.dto.response.ErrorResponse;
+import com.vyxentra.vehicle.exceptions.ErrorCode;
+import com.vyxentra.vehicle.utils.CorrelationIdUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,89 +21,69 @@ public class FallbackController {
 
     @GetMapping("/auth")
     public Mono<ResponseEntity<ApiResponse<Void>>> authFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Auth service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("Auth service is temporarily unavailable"));
     }
 
-    @GetMapping("/user")
+    @GetMapping("/users")
     public Mono<ResponseEntity<ApiResponse<Void>>> userFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("User service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("User service is temporarily unavailable"));
     }
 
-    @GetMapping("/provider")
+    @GetMapping("/providers")
     public Mono<ResponseEntity<ApiResponse<Void>>> providerFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Provider service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("Provider service is temporarily unavailable"));
     }
 
-    @GetMapping("/booking")
+    @GetMapping("/employees")
+    public Mono<ResponseEntity<ApiResponse<Void>>> employeeFallback() {
+        return Mono.just(createFallbackResponse("Employee service is temporarily unavailable"));
+    }
+
+    @GetMapping("/catalog")
+    public Mono<ResponseEntity<ApiResponse<Void>>> catalogFallback() {
+        return Mono.just(createFallbackResponse("Service catalog is temporarily unavailable"));
+    }
+
+    @GetMapping("/bookings")
     public Mono<ResponseEntity<ApiResponse<Void>>> bookingFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Booking service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("Booking service is temporarily unavailable"));
     }
 
-    @GetMapping("/payment")
-    public Mono<ResponseEntity<ApiResponse<Void>>> paymentFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Payment service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+    @GetMapping("/emergency")
+    public Mono<ResponseEntity<ApiResponse<Void>>> emergencyFallback() {
+        return Mono.just(createFallbackResponse("Emergency dispatch service is temporarily unavailable"));
     }
 
     @GetMapping("/tracking")
     public Mono<ResponseEntity<ApiResponse<Void>>> trackingFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Tracking service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("Tracking service is temporarily unavailable"));
     }
 
-    @GetMapping("/notification")
+    @GetMapping("/payments")
+    public Mono<ResponseEntity<ApiResponse<Void>>> paymentFallback() {
+        return Mono.just(createFallbackResponse("Payment service is temporarily unavailable"));
+    }
+
+    @GetMapping("/notifications")
     public Mono<ResponseEntity<ApiResponse<Void>>> notificationFallback() {
-        return Mono.just(ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Notification service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+        return Mono.just(createFallbackResponse("Notification service is temporarily unavailable"));
     }
 
     @GetMapping("/admin")
     public Mono<ResponseEntity<ApiResponse<Void>>> adminFallback() {
-        return Mono.just(ResponseEntity
+        return Mono.just(createFallbackResponse("Admin service is temporarily unavailable"));
+    }
+
+    private ResponseEntity<ApiResponse<Void>> createFallbackResponse(String message) {
+        ErrorResponse error = ErrorResponse.builder()
+                .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                .message(message)
+                .timestamp(Instant.now())
+                .correlationId(CorrelationIdUtil.getCurrentCorrelationId())
+                .build();
+
+        return ResponseEntity
                 .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ApiResponse.<Void>builder()
-                        .success(false)
-                        .message("Admin service is temporarily unavailable. Please try again later.")
-                        .timestamp(Instant.now())
-                        .build()));
+                .body(ApiResponse.error(error));
     }
 }

@@ -1,0 +1,1 @@
+                                                                                                                   Emergency service assigned! Provider ${providerName} will arrive in ${etaMinutes} minutes. Track at: ${trackingUrl}

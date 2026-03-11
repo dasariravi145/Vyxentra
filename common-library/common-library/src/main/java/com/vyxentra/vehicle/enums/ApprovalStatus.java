@@ -5,5 +5,7 @@ public enum ApprovalStatus {
     PENDING,
     APPROVED,
     PARTIALLY_APPROVED,
-    REJECTED
+    REJECTED,
+    REPORTED,
+    EXPIRED
 }

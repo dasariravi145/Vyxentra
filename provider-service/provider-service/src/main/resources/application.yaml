@@ -1,3 +1,158 @@
+server:
+  port: 7150
+  shutdown: graceful
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
 spring:
   application:
     name: provider-service
+
+  config:
+    import: "optional:configserver:"
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/vyxentra_productservice}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin@123}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+    show-sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.type.mapping: event:com.vehicle.common.events.BaseEvent
+    consumer:
+      group-id: provider-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.vehicle.common.events
+        spring.json.type.mapping: event:com.vehicle.common.events.BaseEvent
+
+# Redis Geo Indices (custom configuration)
+redis:
+  geo:
+    indices:
+      bike-repair: ${REDIS_GEO_BIKE_REPAIR:bike:repair}
+      car-repair: ${REDIS_GEO_CAR_REPAIR:car:repair}
+      bike-fuel: ${REDIS_GEO_BIKE_FUEL:bike:fuel}
+      car-fuel: ${REDIS_GEO_CAR_FUEL:car:fuel}
+      providers: ${REDIS_GEO_PROVIDERS:providers:geo}
+
+# Provider service configuration
+provider:
+  search:
+    max-radius-km: ${PROVIDER_MAX_RADIUS:50}
+    default-radius-km: ${PROVIDER_DEFAULT_RADIUS:5}
+    radius-increment-km: ${PROVIDER_RADIUS_INCREMENT:5}
+    max-results: ${PROVIDER_MAX_RESULTS:20}
+  approval:
+    auto-approve: ${PROVIDER_AUTO_APPROVE:false}
+    require-documents: ${PROVIDER_REQUIRE_DOCUMENTS:true}
+
+# Eureka Service Discovery
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:7145/eureka}
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    prefer-ip-address: true
+
+# Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
+  retry:
+    instances:
+      userService:
+        max-attempts: 3
+        wait-duration: 1s
+
+# Feign Client
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+  circuitbreaker:
+    enabled: true
+
+# Actuator / Observability
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+# Logging
+logging:
+  level:
+    com.vehicle.provider: DEBUG
+    org.springframework.data.redis: INFO
+    org.springframework.kafka: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/provider-service.log

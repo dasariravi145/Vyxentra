@@ -1,40 +1,29 @@
 package com.vyxentra.vehicle.exceptions;
 
+
+
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 public class BusinessException extends RuntimeException {
+    private final ErrorCode errorCode;
+    private final String[] args;
 
-    private final String errorCode;
-    private final HttpStatus httpStatus;
-    private final Object[] args;
-
-    public BusinessException(String message) {
-        super(message);
-        this.errorCode = "BUSINESS_ERROR";
-        this.httpStatus = HttpStatus.BAD_REQUEST;
-        this.args = null;
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+        this.args = new String[0];
     }
 
-    public BusinessException(String message, String errorCode) {
-        super(message);
+    public BusinessException(ErrorCode errorCode, String... args) {
+        super(String.format(errorCode.getMessage(), (Object[]) args));
         this.errorCode = errorCode;
-        this.httpStatus = HttpStatus.BAD_REQUEST;
-        this.args = null;
-    }
-
-    public BusinessException(String message, String errorCode, HttpStatus httpStatus) {
-        super(message);
-        this.errorCode = errorCode;
-        this.httpStatus = httpStatus;
-        this.args = null;
-    }
-
-    public BusinessException(String message, String errorCode, Object... args) {
-        super(message);
-        this.errorCode = errorCode;
-        this.httpStatus = HttpStatus.BAD_REQUEST;
         this.args = args;
+    }
+
+    public BusinessException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.errorCode = errorCode;
+        this.args = new String[0];
     }
 }

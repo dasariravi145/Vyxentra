@@ -1,20 +1,24 @@
 package com.vyxentra.vehicle.service;
 
-import com.vyxentra.vehicle.enums.UserRole;
+
+
+
+import com.vyxentra.vehicle.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Slf4j
 @Service
@@ -23,99 +27,75 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
-
-    @Value("${jwt.refresh-expiration}")
-    private Long refreshExpiration;
-
-    private Key key;
-
-    @PostConstruct
-    public void init() {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-    }
-
-    public String generateToken(String userId, String mobileNumber, Set<UserRole> roles) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
-
-        List<String> roleStrings = roles.stream()
-                .map(UserRole::name)
-                .collect(Collectors.toList());
-
-        return Jwts.builder()
-                .setSubject(userId)
-                .claim("mobileNumber", mobileNumber)
-                .claim("roles", roleStrings)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String generateRefreshToken(String userId, String mobileNumber) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + refreshExpiration);
-
-        return Jwts.builder()
-                .setSubject(userId)
-                .claim("mobileNumber", mobileNumber)
-                .claim("type", "refresh")
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-    }
+    @Value("${jwt.expiration:86400000}")
+    private long expirationMs;
 
     public String extractUserId(String token) {
-        return extractAllClaims(token).getSubject();
+        return extractClaim(token, claims -> claims.get("userId", String.class));
     }
 
-    public String extractMobileNumber(String token) {
-        return extractAllClaims(token).get("mobileNumber", String.class);
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public Set<UserRole> extractRoles(String token) {
-        List<String> roles = extractAllClaims(token).get("roles", List.class);
-        return roles.stream()
-                .map(UserRole::valueOf)
-                .collect(Collectors.toSet());
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
-    public Date getExpirationDate(String token) {
-        return extractAllClaims(token).getExpiration();
+    public String generateToken(User user) {
+        return generateToken(new HashMap<>(), user);
     }
 
-    public Long getExpirationTime() {
-        return expiration;
+    public String generateToken(Map<String, Object> extraClaims, User user) {
+        return buildToken(extraClaims, user, expirationMs);
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            log.error("Token validation failed: {}", e.getMessage());
-            return false;
-        }
+    public String generateRefreshToken(User user) {
+        return buildToken(new HashMap<>(), user, expirationMs * 7); // 7 days
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, User user, long expiration) {
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("role", user.getRole().name());
+        extraClaims.put("suspended", "SUSPENDED".equals(user.getProviderStatus()));
+
+        return Jwts.builder()
+                .setClaims(extraClaims)
+                .setSubject(user.getPhoneNumber())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String userId = extractUserId(token);
+        return (userId.equals(((User) userDetails).getId())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public boolean isRefreshToken(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return "refresh".equals(claims.get("type"));
-        } catch (Exception e) {
-            return false;
-        }
+    private Key getSigningKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public long getExpirationMs() {
+        return expirationMs;
     }
 }
-

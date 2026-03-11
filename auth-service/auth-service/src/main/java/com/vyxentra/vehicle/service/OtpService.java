@@ -1,93 +1,99 @@
 package com.vyxentra.vehicle.service;
 
-import com.vyxentra.vehicle.constants.ApiConstants;
-import com.vyxentra.vehicle.constants.ErrorCodes;
-import com.vyxentra.vehicle.constants.RedisKeys;
+
+import com.vyxentra.vehicle.constants.ServiceConstants;
 import com.vyxentra.vehicle.exceptions.BusinessException;
-import com.vyxentra.vehicle.util.IdGenerator;
+import com.vyxentra.vehicle.exceptions.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final NotificationService notificationService;
 
-    public String generateAndStoreOtp(String mobileNumber) {
-        // Check if user is blocked
-        String blockKey = RedisKeys.getOtpBlockKey(mobileNumber);
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(blockKey))) {
-            throw new BusinessException("Too many OTP attempts. Please try after some time.",
-                    ErrorCodes.AUTH_BLOCKED);
-        }
+    @Value("${otp.expiry-seconds:300}")
+    private int otpExpirySeconds;
 
-        // Check rate limiting
-        String attemptKey = RedisKeys.getOtpAttemptKey(mobileNumber);
-        String attemptsStr = redisTemplate.opsForValue().get(attemptKey);
-        int attempts = attemptsStr != null ? Integer.parseInt(attemptsStr) : 0;
+    @Value("${otp.length:6}")
+    private int otpLength;
 
-        if (attempts >= ApiConstants.OTP_MAX_ATTEMPTS) {
-            // Block user for 30 minutes
-            redisTemplate.opsForValue().set(blockKey, "blocked", Duration.ofMinutes(30));
-            redisTemplate.delete(attemptKey);
-            throw new BusinessException("Maximum OTP attempts exceeded. Please try after 30 minutes.",
-                    ErrorCodes.AUTH_MAX_ATTEMPTS);
-        }
+    @Value("${otp.max-attempts:3}")
+    private int maxAttempts;
 
+    private final SecureRandom secureRandom = new SecureRandom();
+
+    public String generateAndSendOtp(String phoneNumber) {
         // Generate OTP
-        String otp = IdGenerator.generateOTP();
-        String otpKey = RedisKeys.getOtpKey(mobileNumber);
+        String otp = generateOtp();
 
-        // Store OTP with expiry
-        redisTemplate.opsForValue().set(otpKey, otp, Duration.ofMinutes(ApiConstants.OTP_EXPIRY_MINUTES));
+        // Store in Redis with expiry
+        String otpKey = ServiceConstants.OTP_CACHE_PREFIX + phoneNumber;
+        String attemptsKey = ServiceConstants.OTP_CACHE_PREFIX + "attempts:" + phoneNumber;
 
-        // Increment attempts
-        redisTemplate.opsForValue().increment(attemptKey);
-        redisTemplate.expire(attemptKey, Duration.ofHours(1));
+        redisTemplate.opsForValue().set(otpKey, otp, otpExpirySeconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(attemptsKey, "0", otpExpirySeconds, TimeUnit.SECONDS);
 
-        log.debug("OTP generated for {}: {}", mobileNumber, otp);
+        // In production, send via SMS
+        // For development, log the OTP
+        log.info("OTP for {}: {}", phoneNumber, otp);
+
+        // Send notification
+        notificationService.sendOtp(phoneNumber, otp);
+
         return otp;
     }
 
-    public boolean verifyOtp(String mobileNumber, String otp) {
-        String otpKey = RedisKeys.getOtpKey(mobileNumber);
-        String storedOtp = redisTemplate.opsForValue().get(otpKey);
+    public boolean verifyOtp(String phoneNumber, String otp) {
+        String otpKey = ServiceConstants.OTP_CACHE_PREFIX + phoneNumber;
+        String attemptsKey = ServiceConstants.OTP_CACHE_PREFIX + "attempts:" + phoneNumber;
+
+        String storedOtp = (String) redisTemplate.opsForValue().get(otpKey);
 
         if (storedOtp == null) {
-            log.warn("OTP verification failed - no OTP found for: {}", mobileNumber);
+            throw new BusinessException(ErrorCode.OTP_EXPIRED);
+        }
+
+        // Check attempts
+        Integer attempts = (Integer) redisTemplate.opsForValue().get(attemptsKey);
+        if (attempts == null) {
+            attempts = 0;
+        }
+
+        if (attempts >= maxAttempts) {
+            // Delete OTP after max attempts
+            redisTemplate.delete(otpKey);
+            redisTemplate.delete(attemptsKey);
+            throw new BusinessException(ErrorCode.OTP_MAX_ATTEMPTS);
+        }
+
+        if (!storedOtp.equals(otp)) {
+            // Increment attempts
+            redisTemplate.opsForValue().increment(attemptsKey);
             return false;
         }
 
-        boolean isValid = storedOtp.equals(otp);
-
-        if (isValid) {
-            log.debug("OTP verified successfully for: {}", mobileNumber);
-        } else {
-            log.warn("Invalid OTP attempt for: {}", mobileNumber);
-        }
-
-        return isValid;
-    }
-
-    public void clearOtp(String mobileNumber) {
-        String otpKey = RedisKeys.getOtpKey(mobileNumber);
+        // Clear OTP on successful verification
         redisTemplate.delete(otpKey);
+        redisTemplate.delete(attemptsKey);
 
-        String attemptKey = RedisKeys.getOtpAttemptKey(mobileNumber);
-        redisTemplate.delete(attemptKey);
-
-        log.debug("OTP data cleared for: {}", mobileNumber);
+        return true;
     }
 
-    public boolean isBlocked(String mobileNumber) {
-        String blockKey = RedisKeys.getOtpBlockKey(mobileNumber);
-        return Boolean.TRUE.equals(redisTemplate.hasKey(blockKey));
+    private String generateOtp() {
+        StringBuilder otp = new StringBuilder();
+        for (int i = 0; i < otpLength; i++) {
+            otp.append(secureRandom.nextInt(10));
+        }
+        return otp.toString();
     }
 }
-
