@@ -5,8 +5,6 @@ import com.vyxentra.vehicle.enums.Role;
 import com.vyxentra.vehicle.security.JwtUtil;
 import com.vyxentra.vehicle.validator.RouteValidator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -14,12 +12,14 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 
 import java.util.List;
 
 @Slf4j
 @Component
-public class AuthenticationFilter implements GlobalFilter, Ordered {
+public class AuthenticationFilter implements WebFilter, Ordered {
 
     private final RouteValidator routeValidator;
     private final JwtUtil jwtUtil;
@@ -30,7 +30,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
         // Skip authentication for open endpoints

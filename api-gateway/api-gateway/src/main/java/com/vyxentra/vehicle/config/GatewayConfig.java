@@ -5,12 +5,14 @@ package com.vyxentra.vehicle.config;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import reactor.core.publisher.Mono;
 
 @Configuration
 public class GatewayConfig {
 
     @Bean
+    @Primary
     public KeyResolver userKeyResolver() {
         return exchange -> {
             String userId = exchange.getRequest().getHeaders().getFirst("X-User-ID");

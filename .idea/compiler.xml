@@ -21,20 +21,7 @@
         </processorPath>
         <module name="user-service" />
       </profile>
-      <profile name="Annotation profile for service-catalog-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
-        </processorPath>
-        <module name="auth-service" />
-        <module name="common-library" />
-        <module name="service-catalog-service" />
-        <module name="provider-service" />
-        <module name="employee-service" />
-      </profile>
-      <profile name="Annotation profile for admin-service" enabled="true">
+      <profile name="Annotation profile for provider-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -42,12 +29,17 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
         </processorPath>
+        <module name="auth-service" />
         <module name="payment-service" />
+        <module name="service-catalog-service" />
+        <module name="booking-service" />
+        <module name="common-library" />
+        <module name="provider-service" />
         <module name="admin-service" />
         <module name="notification-service" />
+        <module name="employee-service" />
         <module name="tracking-service" />
         <module name="emergency-dispatch-service" />
-        <module name="booking-service" />
       </profile>
     </annotationProcessing>
   </component>

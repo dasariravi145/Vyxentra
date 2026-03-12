@@ -11,7 +11,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.server.WebFilter;
 
 import java.util.Arrays;
 
@@ -38,7 +37,7 @@ public class SecurityConfig {
                         .anyExchange()
                         .authenticated()
                 )
-                .addFilterBefore((WebFilter) authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterBefore(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 
